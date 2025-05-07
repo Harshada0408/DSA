@@ -1,0 +1,75 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <climits>
+using namespace std;
+
+int findCityIndex(string cities[], int n, const string& name) {
+    for (int i = 0; i < n; ++i) {
+        if (cities[i] == name) return i;
+    }
+    return -1;
+}
+
+void primMST(int** matrix, int numcities, string cities[]) {
+    vector<int> parent(numcities, -1), key(numcities, INT_MAX);
+    vector<bool> inMST(numcities, false);
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+
+    key[0] = 0;
+    pq.push({0, 0});  // {weight, vertex}
+
+    while (!pq.empty()) {
+        int u = pq.top().second; pq.pop();  // Get the vertex of the edge with the smallest weight
+        if (inMST[u]) continue;
+        inMST[u] = true;
+
+        for (int v = 0; v < numcities; ++v) {
+            if (matrix[u][v] && !inMST[v] && matrix[u][v] < key[v]) {
+                key[v] = matrix[u][v];
+                parent[v] = u;
+                pq.push({key[v], v});  // Push {new key, vertex} to the priority queue
+            }
+        }
+    }
+
+    int totalCost = 0;
+    cout << "\nMinimum Spanning Tree (MST):\n";
+    for (int i = 1; i < numcities; ++i) {
+        cout << cities[parent[i]] << " - " << cities[i] << "\t" << key[i] << "\n";
+        totalCost += key[i];
+    }
+    cout << "\nTotal Minimum Cost: " << totalCost << "\n";
+}
+
+int main() {
+    int numcities;
+    cout << "Enter number of cities: ";
+    cin >> numcities;
+    string* cities = new string[numcities];
+    cout << "Enter city names:\n";
+    for (int i = 0; i < numcities; ++i) cin >> cities[i];
+
+    int** matrix = new int*[numcities];
+    for (int i = 0; i < numcities; ++i) matrix[i] = new int[numcities]{};  // Initialize matrix to zero
+
+    int numEdges;
+    cout << "Enter number of direct connections: ";
+    cin >> numEdges;
+    cout << "For each connection, enter: <CityA> <CityB> <Cost>\n";
+    for (int e = 0; e < numEdges; ++e) {
+        string a, b;
+        int cost;
+        cin >> a >> b >> cost;
+        int i = findCityIndex(cities, numcities, a), j = findCityIndex(cities, numcities, b);
+        matrix[i][j] = matrix[j][i] = cost;  // Undirected graph, so fill both sides
+    }
+
+    primMST(matrix, numcities, cities);
+
+    delete[] cities;
+    for (int i = 0; i < numcities; ++i) delete[] matrix[i];
+    delete[] matrix;
+
+    return 0;
+}

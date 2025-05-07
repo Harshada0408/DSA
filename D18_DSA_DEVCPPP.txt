@@ -1,0 +1,64 @@
+#include <iostream>
+using namespace std;
+const int MAX = 100;
+const int INF = 1e9;
+int keys[MAX];
+int freq[MAX];
+int cost[MAX][MAX];
+int weight[MAX][MAX];
+int root[MAX][MAX];
+void printInOrder(int i, int j) {
+    if (i >= j) return;
+    int r = root[i][j];
+    printInOrder(i, r);
+    cout << keys[r] << " ";
+    printInOrder(r + 1, j);
+}
+int main() {
+    int n;
+    cout << "Enter number of keys: ";  
+    cin >> n;
+    cout << "Enter " << n << " keys:\n";
+    for (int i = 0; i < n; ++i) {
+        cin >> keys[i];
+    }
+    cout << "Enter frequencies (number of accesses) for each key:\n";
+    for (int i = 0; i < n; ++i) {
+        cin >> freq[i];
+    }
+    for (int i = 0; i <= n; ++i) {
+        for (int j = 0; j <= n; ++j) {
+            cost[i][j] = 0;
+            weight[i][j] = 0;
+            root[i][j] = 0;
+        }
+    }
+    for (int i = 0; i < n; ++i) {
+        cost[i][i + 1] = freq[i];
+        weight[i][i + 1] = freq[i];
+        root[i][i + 1] = i;
+    }
+    for (int length = 2; length <= n; ++length) {
+        for (int i = 0; i <= n - length; ++i) {
+            int j = i + length;
+            cost[i][j] = INF;
+
+            weight[i][j] = 0;
+            for (int t = i; t < j; ++t)
+                weight[i][j] += freq[t];
+
+            for (int k = i; k < j; ++k) {
+                int c = cost[i][k] + cost[k + 1][j] + weight[i][j];
+                if (c < cost[i][j]) {
+                    cost[i][j] = c;
+                    root[i][j] = k;
+                }
+            }
+        }
+    }
+    cout << "\n Minimum cost of Optimal BST: " << cost[0][n] << endl;
+    cout << "\n Inorder traversal of Optimal BST:\n";
+    printInOrder(0, n);
+    cout << endl;
+    return 0;
+}
