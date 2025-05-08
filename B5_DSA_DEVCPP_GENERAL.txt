@@ -1,0 +1,120 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <queue> 
+
+using namespace std;
+
+class Node {
+public:
+    string data;
+    vector<Node*> children;  // Vector to store children
+
+    Node(string val) {
+        data = val;
+    }
+};
+
+class Tree {
+private:
+    Node* root;
+
+    Node* insertNode() {
+        string value;
+        cout << "Enter node value (-1 for no node): ";
+        cin >> value;
+        if (value == "-1") return NULL;
+
+        Node* newNode = new Node(value);
+
+        int childCount;
+        cout << "How many children for " << value << "? ";
+        cin >> childCount;
+
+        for (int i = 0; i < childCount; ++i) {
+            cout << "Enter child " << i + 1 << " of " << value << ":\n";
+            newNode->children.push_back(insertNode());
+        }
+
+        return newNode;
+    }
+
+    void preorder(Node* node) {
+        if (node == NULL) return;
+        cout << node->data << " ";
+        for (int i = 0; i < node->children.size(); ++i) {
+            preorder(node->children[i]);
+        }
+    }
+
+    void postorder(Node* node) {
+        if (node == NULL) return;
+        for (int i = 0; i < node->children.size(); ++i) {
+            postorder(node->children[i]);
+        }
+        cout << node->data << " ";
+    }
+
+
+void levelOrder(Node* root) {
+    if (root == NULL) return;
+
+    queue<Node*> q;  
+    q.push(root);    /
+
+    while (!q.empty()) {
+        Node* current = q.front();
+        q.pop();  /
+
+        cout << current->data << " ";
+
+        for (int i = 0; i < current->children.size(); ++i) {
+            q.push(current->children[i]);
+        }
+    }
+}
+
+
+public:
+    Tree() { root = NULL; }
+
+    void insert() {
+        root = insertNode();
+    }
+
+    void printTree() {
+        if (root == NULL) {
+            cout << "Tree is empty!\n";
+            return;
+        }
+        int choice;
+        cout << "Choose traversal:\n";
+        cout << "1. Preorder\n2. Postorder\n3. Level Order\n";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: preorder(root); break;
+            case 2: postorder(root); break;
+            case 3: levelOrder(root); break;
+            default: cout << "Invalid choice!\n";
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    Tree tree;
+    int choice;
+    do {
+        cout << "Menu:\n1. Insert Tree\n2. Print Tree\n3. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+        switch (choice) {
+            case 1: tree.insert(); break;
+            case 2: tree.printTree(); break;
+            case 3: cout << "Exiting...\n"; break;
+            default: cout << "Invalid choice! Try again.\n";
+        }
+    } while (choice != 3);
+    return 0;
+}
