@@ -14,78 +14,35 @@ public:
 };
 
 class Stack {
-private:
-    struct StackNode {
-        Node* treeNode;
-        StackNode* next;
+    private:
+        static const int MAX = 15;
+        Node* arr[MAX];
+        int top;
 
-        StackNode(Node* node, StackNode* nextNode) : treeNode(node), next(nextNode) {}
-    };
-    StackNode* top;
+    public:
+        Stack() : top(-1) {}
 
-public:
-    Stack() {
-        top = NULL;
-    }
-
-    void push(Node* node) {
-        StackNode* newNode = new StackNode(node, top);
-        top = newNode;
-    }
-
-    Node* pop() {
-        if (isEmpty()) return NULL;
-        StackNode* temp = top;
-        top = top->next;
-        Node* poppedNode = temp->treeNode;
-        delete temp;
-        return poppedNode;
-    }
-
-    bool isEmpty() {
-        return top == NULL;
-    }
-};
-
-class Queue {
-private:
-    struct QueueNode {
-        Node* treeNode;
-        QueueNode* next;
-
-        QueueNode(Node* node, QueueNode* nextNode) : treeNode(node), next(nextNode) {}
-    };
-    QueueNode *front, *rear;
-
-public:
-    Queue() {
-        front = rear = NULL;
-    }
-
-    void enqueue(Node* node) {
-        QueueNode* newNode = new QueueNode(node, NULL);
-        if (rear == NULL) {
-            front = rear = newNode;
-            return;
+        void push(Node* node) {
+            if (top >= MAX - 1) {
+                cout << "Stack overflow!\n";
+                return;
+            }
+            arr[++top] = node;
         }
-        rear->next = newNode;
-        rear = newNode;
-    }
 
-    Node* dequeue() {
-        if (isEmpty()) return NULL;
-        QueueNode* temp = front;
-        front = front->next;
-        if (front == NULL) rear = NULL;
-        Node* dequeuedNode = temp->treeNode;
-        delete temp;
-        return dequeuedNode;
-    }
+        Node* pop() {
+            if (isEmpty()){
+                cout << "Stack underflow!\n";
+                return NULL;
+            }
+            return arr[top--];
+        }
 
-    bool isEmpty() {
-        return front == NULL;
-    }
-};
+        bool isEmpty() {
+            return top == -1;
+        }
+    };
+
 
 class Tree {
 private:
@@ -94,7 +51,7 @@ private:
         string value;
         cout << "Enter value (-1 for no node): ";
         cin >> value;
-        
+
         if (value == "-1") return NULL;
 
         Node* newNode = new Node(value);
@@ -102,7 +59,7 @@ private:
         newNode->left = insertNode();
         cout << "Enter right child of " << value << ":\n";
         newNode->right = insertNode();
-        
+
         return newNode;
     }
 
@@ -189,27 +146,12 @@ public:
         }
     }
 
-    void levelOrder() {
-        if (root == NULL) return;
-
-        Queue q;
-        q.enqueue(root);
-
-        while (!q.isEmpty()) {
-            Node* current = q.dequeue();
-            cout << current->data << " ";
-
-            if (current->left) q.enqueue(current->left);
-            if (current->right) q.enqueue(current->right);
-        }
-    }
-
     void printTree() {
         if (root == NULL) {
             cout << "Tree is empty!\n";
             return;
         }
-        
+
         int choice;
         cout << "Select traversal type:\n";
         cout << "1. Recursive Traversal\n";
@@ -226,13 +168,12 @@ public:
                 default: cout << "Invalid choice!\n"; return;
             }
         } else if (choice == 2) {
-            cout << "1. Inorder\n2. Preorder\n3. Postorder\n4. Level Order\n";
+            cout << "1. Inorder\n2. Preorder\n3. Postorder\n";
             cin >> choice;
             switch (choice) {
                 case 1: inorderNonRecursive(); break;
                 case 2: preorderNonRecursive(); break;
                 case 3: postorderNonRecursive(); break;
-                case 4: levelOrder(); break;
                 default: cout << "Invalid choice!\n"; return;
             }
         } else {
@@ -245,7 +186,7 @@ public:
 int main() {
     Tree tree;
     int choice;
-    
+
     do {
         cout << "\nMenu:\n1. Insert\n2. Print\n3. Exit\n";
         cin >> choice;
